@@ -1,6 +1,5 @@
 import { Update, UpdateItems, Sources } from '@jacobbubu/scuttlebutt-pull'
 import { hi as highChar, lo as lowChar } from '@jacobbubu/between-ts'
-import LRUCache = require('lru-cache')
 import * as sqlite3 from 'sqlite3'
 import { Database, Statement, open, ISqlite } from 'sqlite'
 
@@ -14,8 +13,8 @@ interface Context {
   create: Statement[]
   update: Statement
   getUpdatesById: Statement
+  getCreateUpdateById: Statement
   updateSortId: Statement[]
-  getHistory: Statement
   getPrevSortId: Statement
   getNextSortId: Statement
   getLength: Statement
@@ -25,15 +24,12 @@ interface Context {
 export type SQLiteStoreOptions = Pick<ISqlite.Config, 'filename'> &
   Partial<Omit<ISqlite.Config, 'filename'>> & {
     db?: Database
-    maxItems?: number
   }
 
 export class SQLiteStore extends AsyncStoreBase {
   private readonly _dbOrConfig: Database | ISqlite.Config
   private _context: Context | null = null
   private readonly _tableName: string
-
-  private readonly _jobCache: LRUCache<JobId, AsyncJob>
 
   constructor(opts: SQLiteStoreOptions, tableName: string) {
     super()
@@ -46,27 +42,10 @@ export class SQLiteStore extends AsyncStoreBase {
       this._dbOrConfig.driver = sqlite3.Database
     }
     this._tableName = tableName
-    this._jobCache = new LRUCache({
-      max: opts.maxItems ?? 100,
-    })
   }
 
   get tableName() {
     return this._tableName
-  }
-
-  async getJob(jobId: JobId) {
-    let job = this._jobCache.get(jobId)
-    if (!job) {
-      const updates = await this.getUpdatesById(jobId)
-      if (updates.length !== 0) {
-        job = this.createJob(jobId, updates)
-        this._jobCache.set(jobId, job)
-        return job
-      }
-      return undefined
-    }
-    return job
   }
 
   async init() {
@@ -83,8 +62,8 @@ export class SQLiteStore extends AsyncStoreBase {
       create: await Promise.all(sqls.Create.map((stmt) => db.prepare(stmt))),
       update: await db.prepare(sqls.Update),
       getUpdatesById: await db.prepare(sqls.GetUpdatesById),
+      getCreateUpdateById: await db.prepare(sqls.GetCreateUpdateById),
       updateSortId: await Promise.all(sqls.UpdateSortId.map((stmt) => db.prepare(stmt))),
-      getHistory: await db.prepare(sqls.GetHistory),
       getPrevSortId: await db.prepare(sqls.GetPrevSortId),
       getNextSortId: await db.prepare(sqls.GetNextSortId),
       getLength: await db.prepare(sqls.GetLength),
@@ -99,6 +78,15 @@ export class SQLiteStore extends AsyncStoreBase {
     const { getUpdatesById } = this._context!
     const dbRes = await getUpdatesById.all([jobId])
     return dbRes.map((row) => JSON.parse(row['change']))
+  }
+
+  async getCreateUpdateById(id: JobId) {
+    if (!this._context) {
+      await this.init()
+    }
+    const { getCreateUpdateById } = this._context!
+    const dbRes = await getCreateUpdateById.all(id)
+    return dbRes.length === 0 ? undefined : JSON.parse(dbRes[0]['change'])
   }
 
   async update(update: Update) {
@@ -178,13 +166,7 @@ export class SQLiteStore extends AsyncStoreBase {
         if (dbRes.changes! <= 0) return false
     }
 
-    // re-cache when cache missed
-    let job = this._jobCache.get(jobId)
-    if (!job) {
-      job = await this.getJob(jobId)
-    } else {
-      job.updateFired(update)
-    }
+    this.emit(jobId, update)
     return true
   }
 
@@ -248,13 +230,5 @@ export class SQLiteStore extends AsyncStoreBase {
 
   async tearOff() {
     return
-  }
-
-  private createJob(jobId: JobId, updates?: Update[]): AsyncJob {
-    const job = new AsyncJob(this, jobId)
-    if (updates) {
-      job.loadUpdates(updates)
-    }
-    return job
   }
 }

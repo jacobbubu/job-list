@@ -1,11 +1,11 @@
+import { EventEmitter } from 'events'
 import { Sources, Update } from '@jacobbubu/scuttlebutt-pull'
-
-import { JobId, SortId } from '../common'
 import { hi as highChar, lo as lowChar } from '@jacobbubu/between-ts'
+import { JobId, SortId } from '../common'
 import { AsyncJobList } from './async-job-list'
 import { AsyncJob } from './async-job'
 
-export class AsyncStoreBase {
+export class AsyncStoreBase extends EventEmitter {
   private _jobList: AsyncJobList | undefined = undefined
 
   get jobList() {
@@ -14,10 +14,6 @@ export class AsyncStoreBase {
 
   set jobList(jobList: AsyncJobList) {
     this._jobList = jobList
-  }
-
-  async getJob(jobId: JobId, createIfNotExist = false): Promise<AsyncJob | undefined> {
-    return undefined
   }
 
   async init() {
@@ -30,6 +26,10 @@ export class AsyncStoreBase {
 
   async getUpdatesById(id: JobId): Promise<Update[]> {
     return []
+  }
+
+  async getCreateUpdateById(id: JobId): Promise<Update | undefined> {
+    return undefined
   }
 
   async update(update: Update): Promise<boolean> {

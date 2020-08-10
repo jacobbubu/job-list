@@ -1,11 +1,10 @@
+import { EventEmitter } from 'events'
 import { Sources, Update } from '@jacobbubu/scuttlebutt-pull'
-
-import { JobId, SortId } from '../common'
 import { hi as highChar, lo as lowChar } from '@jacobbubu/between-ts'
+import { JobId, SortId } from '../common'
 import { JobList } from './job-list'
-import { Job } from './job'
 
-export class StoreBase {
+export class StoreBase extends EventEmitter {
   private _jobList: JobList | undefined = undefined
 
   get jobList() {
@@ -14,10 +13,6 @@ export class StoreBase {
 
   set jobList(jobList: JobList) {
     this._jobList = jobList
-  }
-
-  getJob(jobId: JobId, createIfNotExist = false): Job | undefined {
-    return undefined
   }
 
   init(): void {
@@ -30,6 +25,10 @@ export class StoreBase {
 
   getUpdatesById(id: JobId): Update[] {
     return []
+  }
+
+  getCreateUpdateById(id: JobId): Update | undefined {
+    return undefined
   }
 
   update(update: Update): boolean {

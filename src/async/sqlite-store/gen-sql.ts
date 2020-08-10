@@ -57,9 +57,10 @@ export function genSQL(tableName: string) {
       WHERE jobId=? ORDER BY ts ASC
   `
 
-  const GetHistory = `
+  const GetCreateUpdateById = `
     SELECT change
       FROM ${tableName}
+      WHERE jobId=? AND cmd='create'
       ORDER BY ts ASC
   `
 
@@ -92,8 +93,8 @@ export function genSQL(tableName: string) {
     Create,
     Update,
     GetUpdatesById,
+    GetCreateUpdateById,
     UpdateSortId,
-    GetHistory,
     GetPrevSortId,
     GetNextSortId,
     GetLength,

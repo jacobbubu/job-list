@@ -1,6 +1,26 @@
-import { link } from '@jacobbubu/scuttlebutt-pull'
-import { JobList } from '../src'
+import { link, UpdateItems } from '@jacobbubu/scuttlebutt-pull'
+import { JobList, Job, JobChangeItems, JobListUpdateItems, JobListCmdItems } from '../src'
 import { job1Opts, delay } from './common'
+
+function confirmEvent(cmd: string, params: any[], job: Job) {
+  const jobId = params[0]
+  const data1 = params[1]
+  const data2 = cmd !== 'done' ? undefined : params[2]
+  const jobList = cmd !== 'done' ? params[2] : params[3]
+  const update = cmd !== 'done' ? params[3] : params[4]
+  const change = update[UpdateItems.Data]
+  expect(change[JobListUpdateItems.JobId]).toBe(jobId)
+  const payload = change[JobListUpdateItems.Payload]
+  if (cmd === 'create') {
+    expect(payload[JobListCmdItems.Initial]).toBe(data1)
+  } else {
+    expect(payload[1]).toBe(data1)
+  }
+  if (cmd === 'done') {
+    expect(payload[JobListCmdItems.DoneRes]).toBe(data2)
+  }
+  expect(jobList.getJob(jobId)?.toJSON()).toEqual(job.toJSON())
+}
 
 describe('sync', () => {
   it('create/progress/extra/done', async () => {
@@ -32,22 +52,18 @@ describe('sync', () => {
 
     expect(createdByPeer).toHaveBeenCalledTimes(1)
     const paramsOfCreated = createdByPeer.mock.calls[0]
-    expect(paramsOfCreated[0].toJSON()).toEqual(aJob.toJSON())
+    confirmEvent('create', paramsOfCreated, aJob)
 
     expect(progressByPeer).toHaveBeenCalledTimes(1)
     const paramsOfProgress = progressByPeer.mock.calls[0]
-    expect(paramsOfProgress[0].toJSON()).toEqual(aJob.toJSON())
-    expect(paramsOfProgress[1]).toBe('10%')
+    confirmEvent('progress', paramsOfProgress, aJob)
 
     expect(extraByPeer).toHaveBeenCalledTimes(1)
     const paramsOfExtra = extraByPeer.mock.calls[0]
-    expect(paramsOfExtra[0].toJSON()).toEqual(aJob.toJSON())
-    expect(paramsOfExtra[1]).toBe('EXTRA-1')
+    confirmEvent('extra', paramsOfExtra, aJob)
 
     expect(doneByPeer).toHaveBeenCalledTimes(1)
     const paramsOfDone = doneByPeer.mock.calls[0]
-    expect(paramsOfExtra[0].toJSON()).toEqual(aJob.toJSON())
-    expect(paramsOfDone[1]).toBe(null)
-    expect(paramsOfDone[2]).toBe('DONE-1')
+    confirmEvent('done', paramsOfDone, aJob)
   })
 })

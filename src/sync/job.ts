@@ -17,7 +17,7 @@ import {
   JobListCmdItems,
 } from '../common'
 import { JobBase } from './job-base'
-import { StoreBase } from './store-base'
+import { JobList } from './job-list'
 
 export class Job extends JobBase {
   private _initialUpdate: Update | undefined = undefined
@@ -32,12 +32,13 @@ export class Job extends JobBase {
   private _sortId: SortId = hiChar
   private _result: [DoneError, DoneResult] | undefined = undefined
 
-  constructor(private readonly _store: StoreBase, id: JobId) {
+  constructor(private readonly _jobList: JobList, id: JobId) {
     super(id)
+    this.updateFired = this.updateFired.bind(this)
   }
 
   get jobList() {
-    return this._store.jobList
+    return this._jobList
   }
 
   progress(data: any) {

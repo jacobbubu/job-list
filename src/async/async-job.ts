@@ -16,10 +16,10 @@ import {
   JobListUpdateItems,
   JobListCmdItems,
 } from '../common'
-import { AsyncJobBase } from './async-job-base'
-import { AsyncStoreBase } from './async-store-base'
+import { JobBase } from '../sync'
+import { AsyncJobList } from './async-job-list'
 
-export class AsyncJob extends AsyncJobBase {
+export class AsyncJob extends JobBase {
   private _initialUpdate: Update | undefined = undefined
   private readonly _progressUpdates: Update[] = []
   private readonly _extraUpdates: Update[] = []
@@ -32,12 +32,13 @@ export class AsyncJob extends AsyncJobBase {
   private _sortId: SortId = hiChar
   private _result: [DoneError, DoneResult] | undefined = undefined
 
-  constructor(private readonly _store: AsyncStoreBase, id: JobId) {
+  constructor(private readonly _jobList: AsyncJobList, id: JobId) {
     super(id)
+    this.updateFired = this.updateFired.bind(this)
   }
 
   get jobList() {
-    return this._store.jobList
+    return this._jobList
   }
 
   async progress(data: any) {

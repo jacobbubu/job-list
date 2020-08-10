@@ -1,5 +1,5 @@
 import { link } from '@jacobbubu/scuttlebutt-pull'
-import { AsyncJobList, AsyncJob, SQLiteStore } from '../src'
+import { AsyncJobList, SQLiteStore } from '../src'
 
 const main = async () => {
   const tableName = 'JobList'
@@ -27,24 +27,20 @@ const main = async () => {
 
   link(s1, s2)
 
-  b.on('createdByPeer', async (job: AsyncJob) => {
-    console.log('job created@B', job.toJSON())
+  b.on('createdByPeer', async (jobId, initial, jobList, update) => {
+    console.log(`job(${jobId}) created@B`, (await jobList.getJob(jobId)).toJSON())
   })
 
-  b.on('progressByPeer', (job: AsyncJob, progress) => {
-    console.log('job progress:', job.id, progress)
+  b.on('progressByPeer', async (jobId, progress, jobList, update) => {
+    console.log(`job(${jobId}) progress:`, progress)
   })
 
-  b.on('extraByPeer', (job: AsyncJob, extra) => {
-    console.log('job extra:', job.id, extra)
+  b.on('extraByPeer', async (jobId, progress, jobList, update) => {
+    console.log(`job(${jobId}) extra:`, progress)
   })
 
-  b.on('sortIdByPeer', (job: AsyncJob, sortId) => {
-    console.log('job sortId:', job.id, sortId)
-  })
-
-  b.on('doneByPeer', (job: AsyncJob, err, result) => {
-    console.log('job done', job.id, { err, result })
+  b.on('doneByPeer', async (jobId, err, res, jobList, update) => {
+    console.log(`job(${jobId}) done:`, [err, res])
   })
 }
 

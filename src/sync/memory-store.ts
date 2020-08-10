@@ -1,12 +1,9 @@
 import { Update, UpdateItems, Sources, filter } from '@jacobbubu/scuttlebutt-pull'
 import { strord, hi as highChar, lo as lowChar } from '@jacobbubu/between-ts'
 import bs = require('binary-search')
-import LRUCache = require('lru-cache')
 
 import { JobId, SortId, JobListUpdateItems } from '../common'
 import { StoreBase } from './store-base'
-import { Job } from './job'
-import { JobList } from './job-list'
 
 interface SortIdIndexElement {
   jobId: JobId
@@ -17,34 +14,14 @@ function sortIdIndexComparator(a: SortIdIndexElement, b: SortIdIndexElement) {
   return strord(a.sortId, b.sortId)
 }
 
-export interface MemoryStoreOptions {
-  maxItems: number
-}
+export interface MemoryStoreOptions {}
 
 export class MemoryStore extends StoreBase {
   private readonly _hist: Update[] = []
   private _sortIdIndex: SortIdIndexElement[] = []
-  private readonly _jobCache: LRUCache<JobId, Job>
 
   constructor(opts: Partial<MemoryStoreOptions> = {}) {
     super()
-    this._jobCache = new LRUCache({
-      max: opts.maxItems ?? 100,
-    })
-  }
-
-  getJob(jobId: JobId): Job | undefined {
-    let job = this._jobCache.get(jobId)
-    if (!job) {
-      const updates = this.getUpdatesById(jobId)
-      if (updates.length !== 0) {
-        job = this.createJob(jobId, updates)
-        this._jobCache.set(jobId, job)
-        return job
-      }
-      return undefined
-    }
-    return job
   }
 
   init() {
@@ -74,6 +51,14 @@ export class MemoryStore extends StoreBase {
     })
   }
 
+  getCreateUpdateById(id: JobId) {
+    return this._hist.find((u) => {
+      const [jobId, payload] = u[UpdateItems.Data]
+      const [cmd] = payload
+      return jobId === id && cmd === 'create'
+    })
+  }
+
   update(update: Update) {
     const [jobId, payload] = update[UpdateItems.Data]
     const [cmd, sortId] = payload
@@ -97,13 +82,7 @@ export class MemoryStore extends StoreBase {
     }
     this._hist.push(update)
 
-    // re-cache when cache missed
-    let job = this._jobCache.get(jobId)
-    if (!job) {
-      job = this.getJob(jobId)
-    } else {
-      job.updateFired(update)
-    }
+    this.emit(jobId, update)
 
     return true
   }
@@ -134,14 +113,6 @@ export class MemoryStore extends StoreBase {
 
   tearOff() {
     return
-  }
-
-  private createJob(jobId: JobId, updates?: Update[]): Job {
-    const job = new Job(this, jobId)
-    if (updates) {
-      job.loadUpdates(updates)
-    }
-    return job
   }
 }
 

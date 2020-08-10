@@ -1,5 +1,5 @@
 import { link } from '@jacobbubu/scuttlebutt-pull'
-import { JobList, Job } from '../src'
+import { JobList } from '../src'
 
 const a = new JobList({ id: 'A' })
 const b = new JobList({ id: 'B' })
@@ -18,23 +18,18 @@ const s2 = b.createStream({ name: 's2' })
 
 link(s1, s2)
 
-b.on('createdByPeer', (job: Job) => {
-  console.log('job created@B', job.toJSON())
+b.on('createdByPeer', (jobId, initial, jobList, update) => {
+  console.log(`job(${jobId}) created@B`, jobList.getJob(jobId).toJSON())
 })
 
-b.on('progressByPeer', (job: Job, progress) => {
-  console.log('job progress:', job.id, progress)
+b.on('progressByPeer', (jobId, progress, jobList, update) => {
+  console.log(`job(${jobId}) progress:`, progress)
 })
 
-b.on('extraByPeer', (job: Job, extra) => {
-  console.log('job extra:', job.id, extra)
+b.on('extraByPeer', (jobId, progress, jobList, update) => {
+  console.log(`job(${jobId}) extra:`, progress)
 })
 
-b.on('sortIdByPeer', (job: Job, sortId) => {
-  console.log('job sortId:', job.id, sortId)
-})
-
-b.on('doneByPeer', (job: Job, err, result) => {
-  console.log('job done', job.id, { err, result })
-  console.log('job@B', job.toJSON())
+b.on('doneByPeer', (jobId, err, res, jobList, update) => {
+  console.log(`job(${jobId}) done:`, [err, res])
 })
