@@ -10,7 +10,7 @@ export type SortId = string
 export type CreateChange = [JobId, ['create', SortId, JobInitial]]
 export type ProgressChange = [JobId, ['progress', ProgressData]]
 export type ExtraChange = [JobId, ['extra', ExtraData]]
-export type SortIdChange = [JobId, ['sortId', string]]
+export type SortIdChange = [JobId, ['sortId', SortId]]
 export type DoneChange = [JobId, ['done', DoneError, DoneResult]]
 
 export enum JobChangeItems {
