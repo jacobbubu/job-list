@@ -3,7 +3,7 @@ import { JobList } from '../src'
 import { job1Opts, job2Opts, job3Opts, delay } from './common'
 
 describe('seq', () => {
-  it.skip('createBefore', async () => {
+  it('createBefore', async () => {
     const a = new JobList({ id: 'A' })
     const b = new JobList({ id: 'B' })
 
