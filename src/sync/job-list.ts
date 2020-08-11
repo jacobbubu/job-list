@@ -16,6 +16,12 @@ import {
   makeSortChange,
   ToJSON,
   JobOptions,
+  JobInitial,
+  ProgressData,
+  ExtraData,
+  SortId,
+  DoneError,
+  DoneResult,
 } from '../common'
 import { Job } from './job'
 
@@ -25,6 +31,98 @@ import { MemoryStore } from './memory-store'
 export interface JobListOptions extends ScuttlebuttOptions {
   store?: StoreBase
   maxItems?: number
+}
+
+type createListener = (jobId: JobId, initial: JobInitial, jobList: JobList, update: Update) => void
+type progressListener = (
+  jobId: JobId,
+  progress: ProgressData,
+  jobList: JobList,
+  update: Update
+) => void
+type extraListener = (jobId: JobId, extra: ExtraData, jobList: JobList, update: Update) => void
+type sortIdListener = (jobId: JobId, sortId: SortId, jobList: JobList, update: Update) => void
+type doneListener = (
+  jobId: JobId,
+  err: DoneError,
+  res: DoneResult,
+  jobList: JobList,
+  update: Update
+) => void
+
+export interface JobList {
+  addListener(event: 'created' | 'createdByPeer', listener: createListener): this
+  on(event: 'created' | 'createdByPeer', listener: createListener): this
+  once(event: 'created' | 'createdByPeer', listener: createListener): this
+  removeListener(event: 'created' | 'createdByPeer', listener: createListener): this
+  off(event: 'created' | 'createdByPeer', listener: createListener): this
+  emit(
+    event: 'created' | 'createdByPeer',
+    jobId: JobId,
+    initial: JobInitial,
+    jobList: JobList,
+    update: Update
+  ): boolean
+
+  addListener(event: 'progress' | 'progressByPeer', listener: progressListener): this
+  on(event: 'progress' | 'progressByPeer', listener: progressListener): this
+  once(event: 'progress' | 'progressByPeer', listener: progressListener): this
+  removeListener(event: 'progress' | 'progressByPeer', listener: progressListener): this
+  off(event: 'progress' | 'progressByPeer', listener: progressListener): this
+  emit(
+    event: 'progress' | 'progressByPeer',
+    jobId: JobId,
+    progress: ProgressData,
+    jobList: JobList,
+    update: Update
+  ): boolean
+
+  addListener(event: 'extra' | 'extraByPeer', listener: extraListener): this
+  on(event: 'extra' | 'extraByPeer', listener: extraListener): this
+  once(event: 'extra' | 'extraByPeer', listener: extraListener): this
+  removeListener(event: 'extra' | 'extraByPeer', listener: extraListener): this
+  off(event: 'extra' | 'extraByPeer', listener: extraListener): this
+  emit(
+    event: 'extra' | 'extraByPeer',
+    jobId: JobId,
+    extra: ExtraData,
+    jobList: JobList,
+    update: Update
+  ): boolean
+
+  addListener(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
+  on(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
+  once(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
+  removeListener(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
+  off(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
+  emit(
+    event: 'sortId' | 'sortIdByPeer',
+    jobId: JobId,
+    sortId: SortId,
+    jobList: JobList,
+    update: Update
+  ): boolean
+
+  addListener(event: 'done' | 'doneByPeer', listener: doneListener): this
+  on(event: 'done' | 'doneByPeer', listener: doneListener): this
+  once(event: 'done' | 'doneByPeer', listener: doneListener): this
+  removeListener(event: 'done' | 'doneByPeer', listener: doneListener): this
+  off(event: 'done' | 'doneByPeer', listener: doneListener): this
+  emit(
+    event: 'done' | 'doneByPeer',
+    jobId: JobId,
+    err: DoneError,
+    res: DoneResult,
+    jobList: JobList,
+    update: Update
+  ): boolean
+
+  addListener(event: 'invalid', listener: (err: Error) => void): this
+  on(event: 'invalid', listener: (err: Error) => void): this
+  once(event: 'invalid', listener: (err: Error) => void): this
+  removeListener(event: 'invalid', listener: (err: Error) => void): this
+  off(event: 'invalid', listener: (err: Error) => void): this
+  emit(event: 'invalid', err: Error): boolean
 }
 
 export class JobList extends Scuttlebutt {
