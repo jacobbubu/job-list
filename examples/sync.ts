@@ -19,7 +19,7 @@ const s2 = b.createStream({ name: 's2' })
 link(s1, s2)
 
 b.on('createdByPeer', (jobId, initial, jobList, update) => {
-  console.log(`job(${jobId}) created@B`, jobList.getJob(jobId).toJSON())
+  console.log(`job(${jobId}) created@B`, jobList.getJob(jobId)?.toJSON())
 })
 
 b.on('progressByPeer', (jobId, progress, jobList, update) => {
