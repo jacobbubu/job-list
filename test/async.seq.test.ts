@@ -18,7 +18,7 @@ describe('seq', () => {
 
     link(s1, s2)
 
-    await delay(10)
+    await delay(50)
 
     expect((await b.at(0))!.id).toBe(job2.id)
     expect((await b.at(1))!.id).toBe(job1.id)
@@ -39,7 +39,7 @@ describe('seq', () => {
     const s1 = a.createStream({ name: 's1' })
     const s2 = b.createStream({ name: 's2' })
     link(s1, s2)
-    await delay(10)
+    await delay(50)
 
     expect(await b.getLength()).toBe(3)
     expect((await b.at(0))!.id).toBe(job1.id)
@@ -51,7 +51,7 @@ describe('seq', () => {
     expect((await b.at(0))!.id).toBe(job1.id)
     expect((await b.at(1))!.id).toBe(job3.id)
 
-    await delay(10)
+    await delay(50)
 
     expect(await a.at(0)).toBe(job1)
     expect(await a.at(1)).toBe(job3)

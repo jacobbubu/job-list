@@ -50,13 +50,13 @@ describe('async', () => {
 
     link(s1, s2)
 
-    await delay(10)
+    await delay(50)
 
     await aJob.progress('10%')
     await aJob.done(null, 'DONE-1')
     await aJob.extra('EXTRA-1')
 
-    await delay(10)
+    await delay(50)
 
     expect(createdByPeer).toHaveBeenCalledTimes(1)
     const paramsOfCreated = createdByPeer.mock.calls[0]
