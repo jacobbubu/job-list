@@ -58,4 +58,8 @@ export class StoreBase extends EventEmitter {
   at(index: number): SortId | undefined {
     return undefined
   }
+
+  delete(id: JobId | JobId[]): JobId[] {
+    return []
+  }
 }

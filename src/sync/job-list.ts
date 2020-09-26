@@ -329,4 +329,10 @@ export class JobList extends Scuttlebutt {
     }
     return result
   }
+
+  delete(jobId: JobId | JobId[]): JobId[] {
+    const deleted = this.store.delete(jobId)
+    deleted.forEach((id) => this._jobCache.del(id))
+    return deleted
+  }
 }

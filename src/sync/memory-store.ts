@@ -114,6 +114,31 @@ export class MemoryStore extends StoreBase {
   tearOff() {
     return
   }
+
+  delete(id: JobId | JobId[]) {
+    let deleted: Record<JobId, true> = {}
+    const ids = Array.isArray(id) ? id : [id]
+
+    let i = this._hist.length
+
+    while (i--) {
+      const idInUpdate = this._hist[i][UpdateItems.Data][JobListUpdateItems.JobId]
+      if (ids.includes(idInUpdate)) {
+        this._hist.splice(i, 1)
+        deleted[idInUpdate] = true
+      }
+    }
+
+    i = this._sortIdIndex.length
+    while (i--) {
+      const elem = this._sortIdIndex[i]
+      if (ids.includes(elem.jobId)) {
+        this._sortIdIndex.splice(i, 1)
+      }
+    }
+
+    return Object.keys(deleted)
+  }
 }
 
 function prev(sortIdIndex: SortIdIndexElement[], target: SortIdIndexElement) {
