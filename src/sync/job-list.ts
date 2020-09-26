@@ -33,16 +33,31 @@ export interface JobListOptions extends ScuttlebuttOptions {
   maxItems?: number
 }
 
-type createListener = (jobId: JobId, initial: JobInitial, jobList: JobList, update: Update) => void
-type progressListener = (
+export type CreateListener = (
+  jobId: JobId,
+  initial: JobInitial,
+  jobList: JobList,
+  update: Update
+) => void
+export type ProgressListener = (
   jobId: JobId,
   progress: ProgressData,
   jobList: JobList,
   update: Update
 ) => void
-type extraListener = (jobId: JobId, extra: ExtraData, jobList: JobList, update: Update) => void
-type sortIdListener = (jobId: JobId, sortId: SortId, jobList: JobList, update: Update) => void
-type doneListener = (
+export type ExtraListener = (
+  jobId: JobId,
+  extra: ExtraData,
+  jobList: JobList,
+  update: Update
+) => void
+export type SortIdListener = (
+  jobId: JobId,
+  sortId: SortId,
+  jobList: JobList,
+  update: Update
+) => void
+export type DoneListener = (
   jobId: JobId,
   err: DoneError,
   res: DoneResult,
@@ -51,11 +66,11 @@ type doneListener = (
 ) => void
 
 export interface JobList {
-  addListener(event: 'created' | 'createdByPeer', listener: createListener): this
-  on(event: 'created' | 'createdByPeer', listener: createListener): this
-  once(event: 'created' | 'createdByPeer', listener: createListener): this
-  removeListener(event: 'created' | 'createdByPeer', listener: createListener): this
-  off(event: 'created' | 'createdByPeer', listener: createListener): this
+  addListener(event: 'created' | 'createdByPeer', listener: CreateListener): this
+  on(event: 'created' | 'createdByPeer', listener: CreateListener): this
+  once(event: 'created' | 'createdByPeer', listener: CreateListener): this
+  removeListener(event: 'created' | 'createdByPeer', listener: CreateListener): this
+  off(event: 'created' | 'createdByPeer', listener: CreateListener): this
   emit(
     event: 'created' | 'createdByPeer',
     jobId: JobId,
@@ -64,11 +79,11 @@ export interface JobList {
     update: Update
   ): boolean
 
-  addListener(event: 'progress' | 'progressByPeer', listener: progressListener): this
-  on(event: 'progress' | 'progressByPeer', listener: progressListener): this
-  once(event: 'progress' | 'progressByPeer', listener: progressListener): this
-  removeListener(event: 'progress' | 'progressByPeer', listener: progressListener): this
-  off(event: 'progress' | 'progressByPeer', listener: progressListener): this
+  addListener(event: 'progress' | 'progressByPeer', listener: ProgressListener): this
+  on(event: 'progress' | 'progressByPeer', listener: ProgressListener): this
+  once(event: 'progress' | 'progressByPeer', listener: ProgressListener): this
+  removeListener(event: 'progress' | 'progressByPeer', listener: ProgressListener): this
+  off(event: 'progress' | 'progressByPeer', listener: ProgressListener): this
   emit(
     event: 'progress' | 'progressByPeer',
     jobId: JobId,
@@ -77,11 +92,11 @@ export interface JobList {
     update: Update
   ): boolean
 
-  addListener(event: 'extra' | 'extraByPeer', listener: extraListener): this
-  on(event: 'extra' | 'extraByPeer', listener: extraListener): this
-  once(event: 'extra' | 'extraByPeer', listener: extraListener): this
-  removeListener(event: 'extra' | 'extraByPeer', listener: extraListener): this
-  off(event: 'extra' | 'extraByPeer', listener: extraListener): this
+  addListener(event: 'extra' | 'extraByPeer', listener: ExtraListener): this
+  on(event: 'extra' | 'extraByPeer', listener: ExtraListener): this
+  once(event: 'extra' | 'extraByPeer', listener: ExtraListener): this
+  removeListener(event: 'extra' | 'extraByPeer', listener: ExtraListener): this
+  off(event: 'extra' | 'extraByPeer', listener: ExtraListener): this
   emit(
     event: 'extra' | 'extraByPeer',
     jobId: JobId,
@@ -90,11 +105,11 @@ export interface JobList {
     update: Update
   ): boolean
 
-  addListener(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
-  on(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
-  once(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
-  removeListener(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
-  off(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
+  addListener(event: 'sortId' | 'sortIdByPeer', listener: SortIdListener): this
+  on(event: 'sortId' | 'sortIdByPeer', listener: SortIdListener): this
+  once(event: 'sortId' | 'sortIdByPeer', listener: SortIdListener): this
+  removeListener(event: 'sortId' | 'sortIdByPeer', listener: SortIdListener): this
+  off(event: 'sortId' | 'sortIdByPeer', listener: SortIdListener): this
   emit(
     event: 'sortId' | 'sortIdByPeer',
     jobId: JobId,
@@ -103,11 +118,11 @@ export interface JobList {
     update: Update
   ): boolean
 
-  addListener(event: 'done' | 'doneByPeer', listener: doneListener): this
-  on(event: 'done' | 'doneByPeer', listener: doneListener): this
-  once(event: 'done' | 'doneByPeer', listener: doneListener): this
-  removeListener(event: 'done' | 'doneByPeer', listener: doneListener): this
-  off(event: 'done' | 'doneByPeer', listener: doneListener): this
+  addListener(event: 'done' | 'doneByPeer', listener: DoneListener): this
+  on(event: 'done' | 'doneByPeer', listener: DoneListener): this
+  once(event: 'done' | 'doneByPeer', listener: DoneListener): this
+  removeListener(event: 'done' | 'doneByPeer', listener: DoneListener): this
+  off(event: 'done' | 'doneByPeer', listener: DoneListener): this
   emit(
     event: 'done' | 'doneByPeer',
     jobId: JobId,
