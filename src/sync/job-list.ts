@@ -39,24 +39,28 @@ export type CreateListener = (
   jobList: JobList,
   update: Update
 ) => void
+
 export type ProgressListener = (
   jobId: JobId,
   progress: ProgressData,
   jobList: JobList,
   update: Update
 ) => void
+
 export type ExtraListener = (
   jobId: JobId,
   extra: ExtraData,
   jobList: JobList,
   update: Update
 ) => void
+
 export type SortIdListener = (
   jobId: JobId,
   sortId: SortId,
   jobList: JobList,
   update: Update
 ) => void
+
 export type DoneListener = (
   jobId: JobId,
   err: DoneError,

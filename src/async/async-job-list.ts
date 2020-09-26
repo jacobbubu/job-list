@@ -33,21 +33,34 @@ export interface AsyncJobListOptions extends ScuttlebuttOptions {
   maxItems?: number
 }
 
-type createListener = (
+export type AsyncCreateListener = (
   jobId: JobId,
   initial: JobInitial,
   jobList: AsyncJobList,
   update: Update
 ) => void
-type progressListener = (
+
+export type AsyncProgressListener = (
   jobId: JobId,
   progress: ProgressData,
   jobList: AsyncJobList,
   update: Update
 ) => void
-type extraListener = (jobId: JobId, extra: ExtraData, jobList: AsyncJobList, update: Update) => void
-type sortIdListener = (jobId: JobId, sortId: SortId, jobList: AsyncJobList, update: Update) => void
-type doneListener = (
+
+export type AsyncExtraListener = (
+  jobId: JobId,
+  extra: ExtraData,
+  jobList: AsyncJobList,
+  update: Update
+) => void
+export type AsyncSortIdListener = (
+  jobId: JobId,
+  sortId: SortId,
+  jobList: AsyncJobList,
+  update: Update
+) => void
+
+export type AsyncDoneListener = (
   jobId: JobId,
   err: DoneError,
   res: DoneResult,
@@ -56,11 +69,11 @@ type doneListener = (
 ) => void
 
 export interface AsyncJobList {
-  addListener(event: 'created' | 'createdByPeer', listener: createListener): this
-  on(event: 'created' | 'createdByPeer', listener: createListener): this
-  once(event: 'created' | 'createdByPeer', listener: createListener): this
-  removeListener(event: 'created' | 'createdByPeer', listener: createListener): this
-  off(event: 'created' | 'createdByPeer', listener: createListener): this
+  addListener(event: 'created' | 'createdByPeer', listener: AsyncCreateListener): this
+  on(event: 'created' | 'createdByPeer', listener: AsyncCreateListener): this
+  once(event: 'created' | 'createdByPeer', listener: AsyncCreateListener): this
+  removeListener(event: 'created' | 'createdByPeer', listener: AsyncCreateListener): this
+  off(event: 'created' | 'createdByPeer', listener: AsyncCreateListener): this
   emit(
     event: 'created' | 'createdByPeer',
     jobId: JobId,
@@ -69,11 +82,11 @@ export interface AsyncJobList {
     update: Update
   ): boolean
 
-  addListener(event: 'progress' | 'progressByPeer', listener: progressListener): this
-  on(event: 'progress' | 'progressByPeer', listener: progressListener): this
-  once(event: 'progress' | 'progressByPeer', listener: progressListener): this
-  removeListener(event: 'progress' | 'progressByPeer', listener: progressListener): this
-  off(event: 'progress' | 'progressByPeer', listener: progressListener): this
+  addListener(event: 'progress' | 'progressByPeer', listener: AsyncProgressListener): this
+  on(event: 'progress' | 'progressByPeer', listener: AsyncProgressListener): this
+  once(event: 'progress' | 'progressByPeer', listener: AsyncProgressListener): this
+  removeListener(event: 'progress' | 'progressByPeer', listener: AsyncProgressListener): this
+  off(event: 'progress' | 'progressByPeer', listener: AsyncProgressListener): this
   emit(
     event: 'progress' | 'progressByPeer',
     jobId: JobId,
@@ -82,11 +95,11 @@ export interface AsyncJobList {
     update: Update
   ): boolean
 
-  addListener(event: 'extra' | 'extraByPeer', listener: extraListener): this
-  on(event: 'extra' | 'extraByPeer', listener: extraListener): this
-  once(event: 'extra' | 'extraByPeer', listener: extraListener): this
-  removeListener(event: 'extra' | 'extraByPeer', listener: extraListener): this
-  off(event: 'extra' | 'extraByPeer', listener: extraListener): this
+  addListener(event: 'extra' | 'extraByPeer', listener: AsyncExtraListener): this
+  on(event: 'extra' | 'extraByPeer', listener: AsyncExtraListener): this
+  once(event: 'extra' | 'extraByPeer', listener: AsyncExtraListener): this
+  removeListener(event: 'extra' | 'extraByPeer', listener: AsyncExtraListener): this
+  off(event: 'extra' | 'extraByPeer', listener: AsyncExtraListener): this
   emit(
     event: 'extra' | 'extraByPeer',
     jobId: JobId,
@@ -95,11 +108,11 @@ export interface AsyncJobList {
     update: Update
   ): boolean
 
-  addListener(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
-  on(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
-  once(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
-  removeListener(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
-  off(event: 'sortId' | 'sortIdByPeer', listener: sortIdListener): this
+  addListener(event: 'sortId' | 'sortIdByPeer', listener: AsyncSortIdListener): this
+  on(event: 'sortId' | 'sortIdByPeer', listener: AsyncSortIdListener): this
+  once(event: 'sortId' | 'sortIdByPeer', listener: AsyncSortIdListener): this
+  removeListener(event: 'sortId' | 'sortIdByPeer', listener: AsyncSortIdListener): this
+  off(event: 'sortId' | 'sortIdByPeer', listener: AsyncSortIdListener): this
   emit(
     event: 'sortId' | 'sortIdByPeer',
     jobId: JobId,
@@ -108,11 +121,11 @@ export interface AsyncJobList {
     update: Update
   ): boolean
 
-  addListener(event: 'done' | 'doneByPeer', listener: doneListener): this
-  on(event: 'done' | 'doneByPeer', listener: doneListener): this
-  once(event: 'done' | 'doneByPeer', listener: doneListener): this
-  removeListener(event: 'done' | 'doneByPeer', listener: doneListener): this
-  off(event: 'done' | 'doneByPeer', listener: doneListener): this
+  addListener(event: 'done' | 'doneByPeer', listener: AsyncDoneListener): this
+  on(event: 'done' | 'doneByPeer', listener: AsyncDoneListener): this
+  once(event: 'done' | 'doneByPeer', listener: AsyncDoneListener): this
+  removeListener(event: 'done' | 'doneByPeer', listener: AsyncDoneListener): this
+  off(event: 'done' | 'doneByPeer', listener: AsyncDoneListener): this
   emit(
     event: 'done' | 'doneByPeer',
     jobId: JobId,
